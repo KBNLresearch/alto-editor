@@ -21,4 +21,4 @@ Basic setup (for details see the separate subdirs):
 3. On Apache symlink the static dir to /var/www with a name of your choosing
 
 
-.. image:: https://github.com/impactcentre/alto-editor/blob/master/static/img/Screenshot.png
+.. image:: https://github.com/impactcentre/alto-editor/raw/master/static/img/Screenshot.png
