@@ -11,6 +11,7 @@ Next, to get this demo up and running:
 
 2) symlink this folder (static) to your public path (/var/www), using a name of your choosing
 
+3) surf to http://localhost/static/alto_edit/
 
 All remote references are currently hardcoded, so to change them some code review is required:
 
