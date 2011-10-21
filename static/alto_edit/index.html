@@ -1,0 +1,120 @@
+<html>
+	<head id="header">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+		<script type="text/javascript" src="/js/prototype/prototype.js"></script>
+		<script type="text/javascript" src="/js/effects/effects.js"></script>
+		<script type="text/javascript" src="js/image_client_jp2.js"></script>
+		<script type="text/javascript" src="js/alto_view.js"></script>
+		<script type="text/javascript">
+
+			var image_client = null;
+			var viewer = null;
+
+			function init(alto) {
+				if(image_client) {
+					// TODO reinit
+				} else {
+					image_client = new ImageClient(
+						"image_container",
+						alto.identifier, {
+							w: alto.page_width,
+							h: alto.page_height
+						}, "",
+						"/img/spinner.gif",
+						2.0,
+						"http://localhost:3000/" 
+					);
+				}
+				if(viewer) {
+					// TODO reinit
+				} else {
+					viewer = new AltoView(alto, image_client, "ocr_container");
+				}
+				image_client.render();
+			}
+
+			function altoFrom(version) {
+				json_alto("reinitAltoText", version);
+			}
+
+			function json_alto(callback, timestamp) {
+        $('header').insert(new Element("script", {
+          "id": "json_alto_jsonp_response",
+          "type": "text/javascript", 
+          "src": "http://localhost:3002/?url=http://localhost/alto_edit_pub/example.xml" + "&callback=" + callback + (timestamp ? "&timestamp=" + timestamp : "")
+				}));
+			}
+
+			function confirmChanges() {
+				viewer.saveCurrentUpdate();
+				var i = $$('#update_form input').length - 1;
+				if(i > 0) {
+					if(confirm("De laatste wijzigingen zijn niet opgeslagen, wilt u eerste de wijzigingen opslaan?")) {
+						$('image_container').hide(); $('ocr_container').hide(); $('spinner_div').show();
+						$('update_form').submit();
+					} else {
+						$('image_container').hide(); $('ocr_container').hide(); $('spinner_div').show();
+						return true;
+					}
+				} else {
+					$('image_container').hide(); $('ocr_container').hide(); $('spinner_div').show();
+					return true;
+				}
+			}
+
+			function leadingZero(x) {
+				var y = "" + x;
+				var retStr = "";
+				for(var i = 0; i < 4 - y.length; ++i)
+					retStr += "0";
+				return retStr + y;
+			}
+
+			function viewport() {
+				if(document.body.clientWidth && document.body.clientHeight)
+					return {width: document.body.clientWidth, height: document.body.clientHeight};
+				else
+					return {width: 950, height: 600};
+			}
+
+			function scaleWindows() {
+				var dims = viewport();
+				[['image_container', 1.9], ['ocr_container', 2.5]].each(function(x) {
+					$(x[0]).style.width = (dims.width / x[1]) + "px";
+					$(x[0]).style.height = (dims.height - 120) + "px";
+					if(image_client && x[0] == 'image_container') 
+						image_client.updateDims();					
+				});
+			}
+
+			window.onload = function() {
+				$('spinner_div').hide();
+				scaleWindows();
+				json_alto("init");
+			}
+
+			window.onresize = function() { scaleWindows() }
+		</script>
+	</head>
+
+	<body style="font-size: 12px; font-family: arial, sans; line-height: 18px;">
+		<form id="update_form" onsubmit="viewer.saveCurrentUpdate(); $('image_container').hide(); $('ocr_container').hide(); $('spinner_div').show();" action="http://localhost:3002/" method="post" style="float: left">
+			<input type="hidden" name="url" value="http://localhost/alto_edit_pub/example.xml" />
+			<input type="submit" value="Preview" />
+		</form>
+
+		<hr style="clear: both" />	
+			<button onclick="image_client.zoomIn()">+</button>
+			<button onclick="image_client.zoomOut()">-</button>
+			<button onclick="image_client.zoomBack()">[=]</button>
+			<button onclick="image_client.zoomBack(true)">&lt;-&gt;</button>
+		<hr style="clear: both" />
+		<div id="image_container" style="width: 550px; height: 600px; background-repeat: no-repeat; float: left; border: 1px solid;">
+		</div>
+		<div id="ocr_container" style="width: 450px; height: 600px; float: left; margin-left: 20px; border: 1px solid; overflow-y: auto">
+		</div>
+		<div id="spinner_div">
+			<img src="/img/spinner.gif" />
+		</div>
+	</body>
+</html>
