@@ -19,3 +19,6 @@ Basic setup (for details see the separate subdirs):
 2. Run json_alto on port 3002
 
 3. On Apache symlink the static dir to /var/www with a name of your choosing
+
+
+.. image:: https://github.com/impactcentre/alto-editor/blob/master/static/img/Screenshot.png
