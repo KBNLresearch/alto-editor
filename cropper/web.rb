@@ -23,7 +23,7 @@ require 'simple_get_response'
 
 
 get '/' do
-	get = SimpleGetResponse.new(params[:url])
+	get = SimpleGetResponse.new(params[:url] || params[:id])
 	if get.success?
 		img = Magick::Image.from_blob(get.body).first
 	  img.scale!(params[:s].to_f)

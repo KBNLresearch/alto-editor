@@ -1,44 +1,39 @@
-/*
-* image_client_jp2.js: Client for an image service which can zoom and crop via HTTP GET
-* For details see: http://opendatachallenge.kbresearch.nl/
-* Copyright (C) 2011 R. van der Ark, Koninklijke Bibliotheek - National Library of the Netherlands
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
 var ImageClient = Class.create({
-	initialize: function(container_id, urn, fullImageDims, words, spinner_src, zc, altUrl) {
-		this.imgUrl = (altUrl ? altUrl : " secret ");
+	initialize: function(container_id, urn, fullImageDims, words, spinner_src, zc, altUrl, usefullUrl) {
+		this.imgUrl = (altUrl ? altUrl : "http://imageviewer.kb.nl/ImagingService/imagingService");
 		this.container = $(container_id);
-		this.settings = {
-			colour: "89c5e7",
-			coords: urn + ":alto",
-			words: (words ? words : ""),
-			url: urn,
-			r: 0,
-			s: 0.1,
-			x: 0,
-			y: 0,
-			w: parseInt(this.container.style.width),
-			h: parseInt(this.container.style.height)
-    }
+		if(usefullUrl) {
+			this.settings = {
+				colour: "89c5e7",
+				id: urn,
+				r: 0,
+				s: 0.1,
+				x: 0,
+				y: 0,
+				w: parseInt(this.container.style.width),
+				h: parseInt(this.container.style.height),
+				useresolver: "false"
+  	  }
+		} else	{
+			this.settings = {
+				colour: "89c5e7",
+				coords: urn + ":alto",
+				words: (words ? words : ""),
+				id: urn + ":image",
+				r: 0,
+				s: 0.1,
+				x: 0,
+				y: 0,
+				w: parseInt(this.container.style.width),
+				h: parseInt(this.container.style.height)
+  	  }
+		}
+		
 		this.spinner = new Element("img", {
 			"src": (spinner_src ? spinner_src : ""),
 			"style": "margin-top: " + parseInt(this.container.style.height) / 2 + "; margin-left: " + parseInt(this.container.style.width) / 2
 		});
 		this.container.insert(this.spinner);
-//		this.spinner.hide();
 		this.fullImageDims = fullImageDims;
 		this.settings.s = parseInt(this.container.style.height) / this.fullImageDims.h;
 		this.zoomCorrection = (zc ? zc : 1.0);
@@ -193,6 +188,23 @@ var ImageClient = Class.create({
 		this.container.observe("mousedown", function(e) { _this.mouseDown(e); });
 		this.container.observe("mousemove", function(e) { _this.mouseMove(e); });
 		this.container.observe("mouseup", function(e) { _this.mouseUp(e); });
+		var mousewheelevt=(/Firefox/i.test(navigator.userAgent))? "DOMMouseScroll" : "mousewheel";
+		if(Prototype.Browser.IE || Prototype.Browser.Opera)
+			document.attachEvent("on"+mousewheelevt, function(e){ _this.mouseScroll(e) });
+		else
+			document.addEventListener(mousewheelevt, function(e){ _this.mouseScroll(e) }, false);
+	},
+	mouseScroll: function(e) {
+		if(e.clientX > this.container.offsetLeft && e.clientY > this.container.offsetTop &&
+			e.clientX < this.container.offsetLeft + parseInt(this.container.style.width) &&
+			e.clientY < this.container.offsetTop + parseInt(this.container.style.height) && !this.locked) {
+			var evt = window.event || e; 
+	    var delta = evt.detail ? -(evt.detail) : evt.wheelDelta;
+			if(delta < 0)
+				this.zoomOut();
+			else
+				this.zoomIn();
+		}
 	},
 	mouseDown: function(e) {
 		if(Prototype.Browser.IE) { e.returnValue = false; } else { e.preventDefault(); }
@@ -212,7 +224,7 @@ var ImageClient = Class.create({
 		if(this.lastPosition) {
 			var movement = {x:  this.lastPosition.x - e.clientX, y: this.lastPosition.y - e.clientY};
 			this.renderOverlays();
-			if(movement.x != 0 && movement.y != 0) {
+			if(movement.x != 0 || movement.y != 0) {
 				this.setPosition(this.settings.x + movement.x, this.settings.y + movement.y);
 				this.render();
 			}
