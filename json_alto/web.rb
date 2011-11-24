@@ -163,6 +163,7 @@ post "/" do
       correct_whitespaces(doc)
       # Fifth run: correct Hyphenation
       correct_hyphenation(doc)
+
 			x = ""
 			doc.output(x)
 			return x

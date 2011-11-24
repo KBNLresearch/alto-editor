@@ -1,3 +1,21 @@
+/*
+* image_client_jp2.js: Client for an image service which can zoom and crop via HTTP GET
+* For details see: http://opendatachallenge.kbresearch.nl/
+* Copyright (C) 2011 R. van der Ark, Koninklijke Bibliotheek - National Library of the Netherlands
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
 var ImageClient = Class.create({
 	initialize: function(container_id, urn, fullImageDims, words, spinner_src, zc, altUrl, usefullUrl) {
 		this.imgUrl = (altUrl ? altUrl : "http://imageviewer.kb.nl/ImagingService/imagingService");
@@ -29,6 +47,7 @@ var ImageClient = Class.create({
   	  }
 		}
 		
+
 		this.spinner = new Element("img", {
 			"src": (spinner_src ? spinner_src : ""),
 			"style": "margin-top: " + parseInt(this.container.style.height) / 2 + "; margin-left: " + parseInt(this.container.style.width) / 2
@@ -225,6 +244,7 @@ var ImageClient = Class.create({
 			var movement = {x:  this.lastPosition.x - e.clientX, y: this.lastPosition.y - e.clientY};
 			this.renderOverlays();
 			if(movement.x != 0 || movement.y != 0) {
+
 				this.setPosition(this.settings.x + movement.x, this.settings.y + movement.y);
 				this.render();
 			}
