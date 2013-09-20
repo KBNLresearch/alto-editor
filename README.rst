@@ -1,7 +1,7 @@
 Alto Edit
 -----------
 
-[demo](http://altoedit.kbresearch.nl)
+Demo: http://altoedit.kbresearch.nl
 
 Browser based post correction tool for Alto XML files:
 
