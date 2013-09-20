@@ -1,6 +1,8 @@
 Alto Edit
 -----------
 
+[demo](http://altoedit.kbresearch.nl)
+
 Browser based post correction tool for Alto XML files:
 
 This repos contains three parts:
